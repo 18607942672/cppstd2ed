@@ -62,13 +62,18 @@ void fp(const P1&)
 	cout << "call fp(const P1&)" << endl;
 }
 int main() {
+
+	/*C++11之后，这种模板套模板的写法可以直接在右边写>>，中间不用空格*/
 	vector<list<int> > a;//这种定义方式在任何一个版本的C++中都可以使用
 	vector<list<int>> b;//这种定义方式在C++11及以后的版本中可以使用
 
+	/*C++11新增了nullptr关键字来取代0或NULL，用来表示一个指针指向所谓的no value，它是一个确定的值，注意此时不同于指向一个不确定的值
+	  nullptr被自动转换为各种pointer类型，而不是转换成任何整数类型，它的类型为nullptr_t，是一个基础类型*/
 	f(0);//调用f(int)
 	f(NULL);//如果NULL是0，则调用f(int)，其它情况下会出现模棱两可，而出错
 	f(nullptr);//调用f(void*)
 
+	/*C++11允许你声明一个变量或对象而不需要指明其类型，只需说明它是auto*/
 	auto i = 42;//i会被推导成int型
 	auto d = f();//d会被推导成double型
 	//auto i; 这种定义变量方式会产生错误，因为i没有具体的值，所以编译器无法进行类型推导
@@ -81,7 +86,7 @@ int main() {
 		cout << "call lambda l" << endl;
 	};//l会被推导成一个lambda表达式，它以一个int型变量为参数，并返回bool型
 
-	//C++11引入了一致性初始化，对任何初始化动作都可以用大括号来进行
+	/*C++11引入了一致性初始化，对任何初始化动作都可以用大括号来进行*/
 	int values[]{1, 2, 3};
 	vector<int> v1{2, 3, 5, 7, 11, 13, 17};
 	vector<string> cities{
@@ -124,7 +129,7 @@ int main() {
 	fp(P1{47, 11});//直接显示调用二个参数的构造函数
 	fp(P1{47, 11,3});//直接显示调用三个参数的构造函数
 
-	//Range-Based for循环，对区间、数组、集合内(range, array, or collection)的第一个元素进行逐一迭代
+	/*Range-Based for循环，对区间、数组、集合内(range, array, or collection)的第一个元素进行逐一迭代*/
 	for(int i : {2, 3, 5, 7, 9, 13, 17, 19}){
 		cout << i << endl;
 	}//最简单的一个应用，依次打印集合中的素数

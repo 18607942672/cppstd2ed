@@ -124,5 +124,22 @@ int main() {
 	fp(P1{47, 11});//直接显示调用二个参数的构造函数
 	fp(P1{47, 11,3});//直接显示调用三个参数的构造函数
 
+	//Range-Based for循环，对区间、数组、集合内(range, array, or collection)的第一个元素进行逐一迭代
+	for(int i : {2, 3, 5, 7, 9, 13, 17, 19}){
+		cout << i << endl;
+	}//最简单的一个应用，依次打印集合中的素数
+
+	vector<double> vec{0.1, 1.1, 2.1, 3.1};
+	for(auto& elem : vec){
+		elem *= 3;
+	}//对集合中的每个元素依次乘以3，注意elem要声明成引用，否则只会对集合中元素的拷贝进行修改，集合本身不会变
+
+	for(auto& elem : vec){
+		cout << elem << endl;
+	}//再对集合中的元素依次打印
+
+	//可以
+
+
 	return 0;
 }

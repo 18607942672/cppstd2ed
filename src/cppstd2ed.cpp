@@ -1,6 +1,6 @@
 //============================================================================
 // Name        : cppstd2ed.cpp
-// Author      : 
+// Author      :
 // Version     :
 // Copyright   : Your copyright notice
 // Description : Hello World in C++, Ansi-style
@@ -26,6 +26,7 @@ void f(void*)
 double f()
 {
 	cout << "call f()" << endl;
+	return 0;
 }
 
 void print(initializer_list<int> vals)
@@ -61,6 +62,39 @@ void fp(const P1&)
 {
 	cout << "call fp(const P1&)" << endl;
 }
+
+//可以写一个“打印某集合内所有元素”的泛型函数如下
+template<typename T>
+void printElements(const T& coll)
+{
+	for(const auto& elem : coll){
+		cout << elem << endl;
+	}//这个for语句等同于如下代码
+	/*
+	{
+	 	 for(auto _pos = coll.begin(); _pos != coll.end(); ++_pos){
+	 	 	 const auto& elem = *_pos;
+	 	 	 cout << elem << endl;
+	 	 }
+	}
+	*/
+}
+
+class C
+{
+friend ostream& operator<<(ostream& os, const C& c);
+public:
+	C(){}
+	explicit C(const string& s){ str = s;}
+	string str;
+};
+
+ostream& operator<<(ostream& os, const C& c)
+{
+	os << c.str;
+	return os;
+}
+
 int main() {
 
 	/*C++11之后，这种模板套模板的写法可以直接在右边写>>，中间不用空格*/
@@ -139,12 +173,58 @@ int main() {
 		elem *= 3;
 	}//对集合中的每个元素依次乘以3，注意elem要声明成引用，否则只会对集合中元素的拷贝进行修改，集合本身不会变
 
-	for(auto& elem : vec){
+	for(const auto& elem : vec){
 		cout << elem << endl;
 	}//再对集合中的元素依次打印
 
-	//可以
+	//一般而言，如果集合coll提供成员函数begin()和end()，那么一个range-based for循环声明为：
+	/*
+	for(decl : coll){
+		statement
+	}
+	等同于
+	{
+		for(auto _pos = coll.begin(), _end = coll.end(); _pos != _end; ++_pos){
+			decl = *_pos;
+			statement
+		}
+	}
+	 */
+	//如果coll不满足上述条件，那么也等同于以下使用一个全局性begin()和end()且两者都接受coll为实参：
+	/*
+	则等同于
+	{
+		for(auto _pos = begin(coll), _end = end(coll); _pos != _end; ++_pos){
+			decl = *_pos;
+			statement
+		}
+	}
+	 */
+	//可以针对初值列(initializer list)使用range-based for循环，因为initializer_list<>提供了成员函数begin()和end()
+	//对一般的C-style array也可以使用range-based for循环
+	int array[] = {1, 2, 3, 4, 5};
 
+	long sum = 0;//对所有元素累加求和
+	for(int x : array){
+		sum += x;
+	}
+	cout << sum << endl;
+
+	for(auto elem : {sum, sum * 2, sum * 4}){//打印一些sum的倍数
+		cout << elem << endl;
+	}
+	//当元素在for循环中被始化为decl，不得有任何显式类型转换(explicit type conversion)
+	vector<string> vs{"aa", "bb", "cc"};
+	/*
+	for(const C& elem : vs){//会报错，类C的构造函数因explicit的原因，无法将string隐式转换成C
+		cout << elem << endl;
+	}
+	*/
+
+	/*C++11支持move semantic(搬迁语义)，用以避免非必要的拷贝和生成临时对象*/
+
+
+	cout << "The End!" << endl;
 
 	return 0;
 }

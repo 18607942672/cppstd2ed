@@ -275,9 +275,66 @@ int main() {
 	下一个问题，rvalue和lvalue reference的重载规则，如下：
 	1.如果你只实现了
 		void foo(X&);
-	  而没有实现 void foo(X&&),则行为如同C++98：foo()可因lvalue但不能因rvalue被调用。
+	而没有实现 void foo(X&&),则行为如同C++98：foo()可因lvalue但不能因rvalue被调用。
+	2.如果你实现了
+		void foo(const X&);
+	而没有实现void foo(X&&),则行为如同C++98：foo()可因lvalue也可因rvalue被调用。
+	3.如果你实现了
+		void foo(X&);
+		void foo(X&&);
+	或
+		void foo(const X&);
+		void foo(X&&);
+	你可以区分“为rvalue服务”和“为lvalue服务”。“为rvalue服务”的版本被允许且应该提供move语义。
+	4.如果你实现了
+		void foo(X&&);
+	但既没实现void foo(X&)也没有实现void foo(const X&),foo()可因rvalue被调用，
+	但当你尝试以lvalue调用它，会编译报错。因此，这里只提供move语义。
+	如果某个类没有移动构函数和移动赋值构造函数，而只有普通的拷贝构造函数和赋值构造函数的话，
+	右值引用可以调用它们，但这时只是调用普通拷贝和赋值构造函数。
 
+	返回rvalue reference
+	C++11保证对如下代码：
+	X foo()
+	{
+		X x;
+		...
+		return x;
+	}
+	有如下的行为：
+	1.如果X有一个可取用的copy或move构造函数，编译器可能选择略去其中的copy版本。
+	2.否则，如果X有一个move构造函数，X就被moved。
+	3.否则，如果X有一个copy构造函数，X就被copied。
+	4.否则，报一个编译其错误。
+	X&& foo()
+	{
+		X x;
+		...
+		return x;//这将要报错，因为返回的是一个引用（即使是右值引用），但这个引用的对象又马上要销毁。
+	}
 	*/
+
+	/*新式的字符串字面常量（string literal）raw string和multibyte/wide-character*/
+	cout << "\\\\n" << endl;//raw string可以让你少写一点转义符。
+	cout << R"(\\n)" << endl;//raw string以R"(开头，以)"结尾。
+
+	//为了在raw string中打印)"，可以使用定义符（delimiter），完整的语法是R"delim(...)delim"，
+	//其中delim最多不超过16个字符，且不能为反斜线，空格和小括号。定义正则表达式时，raw string特别有用。
+	cout << R"nc(a\
+                 b\nc()"
+                 )nc" << endl;//等同于"a\\\n                 b\\nc()\"\n                 "
+	cout << "a\\\n                 b\\nc()\"\n                 " << endl;
+
+	//编码的string literal
+	//u8定义一个UTF-8编码的字符串；u定义一个由char16_t类型的字符组成的字符串；
+	//U定义一个由char32_t类型的字符组成的字符串；L定义一个由wchar_t类型的字符组成的字符串。
+	cout << L"hello" << endl;//定义一个"hello"字符串，其中每个字符是wchar_t型。
+	cout << sizeof("hello") << endl;
+	cout << sizeof(L"hello") << endl;
+	cout << sizeof(u"hello") << endl;
+	cout << sizeof(U"hello") << endl;
+	cout << sizeof(u8"hello") << endl;
+	cout << sizeof(R"(hello)") << endl;
 
 
 	cout << "The End!" << endl;
